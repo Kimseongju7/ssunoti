@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+
+# 환경 설정 (보안)
+.env
+
+# Firebase 서비스 계정 키 (보안)
+config/serviceAccountKey.json
+
+# Python
+__pycache__/
+*.pyc
+
+# 가상환경
+.venv/
+
+# 테스트
+.pytest_cache/
