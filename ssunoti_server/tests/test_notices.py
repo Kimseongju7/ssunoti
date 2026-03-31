@@ -1,5 +1,5 @@
 import pytest
-from crawling.ssupath_crawling import SsupathCrawler
+from ssunoti.crawler import SsupathCrawler
 
 
 @pytest.fixture(scope="module")

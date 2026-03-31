@@ -1,4 +1,4 @@
-from crawling.ssupath_crawling import SsupathCrawler
+from ssunoti.crawler import SsupathCrawler
 
 
 def test_login_success():

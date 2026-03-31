@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from crawling.ssupath_crawling import SsupathCrawler
+from ssunoti.crawler import SsupathCrawler
 
 crawler = SsupathCrawler()
 success = crawler.login()

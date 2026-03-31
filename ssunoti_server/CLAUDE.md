@@ -1,69 +1,118 @@
-🔔 SSUNoti: 숭실대학교 비교과 공고 알리미 프로젝트 기획서
-🏗️ 1. 시스템 전체 구조 (System Architecture)
-본 프로젝트는 로컬 서버(Python) + Firebase + Flutter의 하이브리드 구조를 채택합니다.
+# SSUNoti: 숭실대학교 비교과 공고 알리미
 
-A. 로컬 서버 (Python & Crawler)
+## 프로젝트 개요
 
-• 주요 기술: Python 3.x, `undetected-chromedriver`, `BeautifulSoup4`, `apscheduler`, `firebase-admin`
+SSUPath(숭실대 비교과 포털)의 공고를 주기적으로 크롤링하여 Firebase에 저장하고, Flutter 앱으로 알림을 제공하는 서비스.
 
-• 역할: 봇 감지를 우회하여 SSUPath 데이터를 수집하고 Firebase로 전송
+---
 
-B. 클라우드 인프라 (Firebase)
-
-• Cloud Firestore: NoSQL 데이터베이스. 공고 정보 및 실시간 인원 수 저장
-
-• Firebase Cloud Messaging (FCM): 푸시 알림 전송 엔진
-
-C. 프론트엔드 (Flutter)
-
-• 주요 기술: Flutter, `cloud_firestore`, `firebase_messaging`
-
-• 역할: 데이터 실시간 리스닝 및 UI 제공, 푸시 수신
-
-📂 2. 상세 파일 구조
-```
-
-ssunoti-project/
-
-├── ssunoti_app/              # Flutter Frontend
-
-├── ssunoti_server/           # Local Python Server
-
-│   ├── config/
-
-│   │   └── serviceAccountKey.json # Firebase 관리자 키
-
-│   ├── src/
-
-│   │   ├── main_scheduler.py # 전체 작업 스케줄러
-
-│   │   ├── crawler_core.py   # 크롤링 핵심 로직
-
-│   │   ├── firebase_util.py  # Firebase 연동 유틸
-
-│   │   └── deadline_checker.py # 마감 알림 로직
-
-│   └── requirements.txt
+## 전체 구조 (Monorepo)
 
 ```
+ssunoti/                          # 프로젝트 루트 (git repo)
+├── ssunoti_server/               # Python 백엔드 (현재 디렉토리)
+└── ssunoti_flutter/              # Flutter 앱 (예정)
+```
 
-🔄 3. 핵심 주기적 작업 (Scheduled Tasks)
-1. 신규 공고 수집 (1시간 주기): 신규 ID 확인 시 전체 파싱 후 저장 & 알림 발송
+Firebase 설정(`firebase.json`, `.firebaserc`)은 루트(`ssunoti/`)에서 관리.
 
-2. 인원 수 모니터링 (15분 주기): 접수 중인 공고 순회 → 인원 업데이트 → 90% 도달 시 알림
+---
 
-3. 마감 기한 체크 (매일 오전): DB 조회 후 마감 임박 건 알림 발송
+## 시스템 아키텍처
 
-💾 4. 데이터베이스 설계 (Firestore)
-• Collection: `notices`
+```
+[Python 크롤러] → [Cloud Firestore] ← [Flutter 앱]
+                         ↓
+                  [FCM 푸시 알림] → [Flutter 앱]
+```
 
-• Document ID: `{notice_id}` (SSUPath 게시글 번호)
+- **Python 백엔드**: SSUPath에서 공고 크롤링 → Firestore에 저장, 스케줄링
+- **Firebase**: Firestore(데이터 저장), FCM(푸시 알림)
+- **Flutter**: Firestore 실시간 리스닝, 푸시 알림 수신
 
-• Fields: title, url, content, deadline(Timestamp), current_capacity, total_capacity, is_closing_soon, notified_deadline, created_at
+---
 
-🚩 5. 핵심 로직
-• 중복 방지: 문서 ID를 게시글 번호로 지정하여 `doc.exists`로 체크
+## 현재 파일 구조 (ssunoti_server/)
 
-• 인원 체크 최적화: 브라우저 세션을 유지한 채 URL만 변경하여 속도 향상
+```
+ssunoti_server/
+├── src/
+│   └── ssunoti/
+│       ├── __init__.py
+│       ├── crawler.py        # SsupathCrawler 클래스 (SSO 로그인, 목록/상세 크롤링)
+│       └── utils.py          # build_url() URL 빌더 유틸
+├── tests/
+│   ├── test_login.py         # 로그인 테스트
+│   ├── test_notices.py       # 공고 목록 파싱 테스트
+│   └── test_request.py       # 요청 관련 테스트
+├── docs/
+│   ├── code/                 # 코드 설명 문서
+│   └── guide/                # 라이브러리 가이드 (requests, bs4, pytest 등)
+├── main.py                   # 진입점 (미구현)
+├── pyproject.toml            # 패키지 빌드 설정
+├── .env                      # 환경변수 (student_no, ssu_pw, user_agent) - git 제외
+└── .gitignore
+```
 
-• 푸시 타겟팅: 전체 알림용 Topic(`all_notices`) 구독 방식 사용
+---
+
+## 구현 현황
+
+### 완료
+- `SsupathCrawler.login()` — SSU SSO 3단계 로그인 (ASPSESSIONID → sToken → JSESSIONID)
+- `SsupathCrawler.get_current_page_notices()` — 공고 목록 파싱
+- `SsupathCrawler.get_notice_url()` — 공고 상세 URL 생성
+- `build_url()` — URL + query params 조합 유틸
+
+### 미구현
+- `SsupathCrawler.get_detail()` — 공고 상세 내용 파싱 (stub)
+- Firebase Admin SDK 연동 (`firebase-admin`)
+- 스케줄러 (`apscheduler`)
+- FCM 푸시 알림 발송
+
+---
+
+## Firestore 데이터 설계
+
+- **Collection**: `notices`
+- **Document ID**: `{notice_id}` (SSUPath 게시글 번호, 중복 방지)
+- **Fields**: `title`, `url`, `content`, `deadline` (Timestamp), `current_capacity`, `total_capacity`, `is_closing_soon`, `notified_deadline`, `created_at`
+
+---
+
+## 주요 기술 스택
+
+| 구분 | 기술 |
+|---|---|
+| 언어 | Python 3.x |
+| 크롤링 | `requests`, `BeautifulSoup4` |
+| Firebase | `firebase-admin` (예정) |
+| 스케줄링 | `apscheduler` (예정) |
+| 테스트 | `pytest` |
+| 환경변수 | `python-dotenv` |
+
+---
+
+## 환경변수 (.env)
+
+```
+student_no=학번
+ssu_pw=비밀번호
+user_agent=브라우저 User-Agent
+```
+
+---
+
+## 주기적 작업 계획 (스케줄러 미구현)
+
+1. **신규 공고 수집** (1시간 주기): 신규 ID 확인 → Firestore 저장 → FCM 알림
+2. **인원 수 모니터링** (15분 주기): 접수 중 공고 순회 → 인원 업데이트 → 90% 도달 시 알림
+3. **마감 기한 체크** (매일 오전): DB 조회 → 마감 임박 건 알림
+
+---
+
+## 개발 환경
+
+- IDE: PyCharm
+- 가상환경: `.venv/` (프로젝트 내 관리)
+- 테스트 실행: `pytest tests/`

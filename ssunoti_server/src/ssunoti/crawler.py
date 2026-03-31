@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import requests
 
-from utils import build_url
+from ssunoti.utils import build_url
 
 load_dotenv()
 
