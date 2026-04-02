@@ -39,18 +39,35 @@ ssunoti_server/
 ├── src/
 │   └── ssunoti/
 │       ├── __init__.py
-│       ├── crawler.py        # SsupathCrawler 클래스 (SSO 로그인, 목록/상세 크롤링)
-│       └── utils.py          # build_url() URL 빌더 유틸
+│       ├── crawler.py              # SsupathCrawler (SSO 로그인, 목록/상세 크롤링)
+│       └── utils.py                # build_url() URL 빌더 유틸
 ├── tests/
-│   ├── test_login.py         # 로그인 테스트
-│   ├── test_notices.py       # 공고 목록 파싱 테스트
-│   └── test_request.py       # 요청 관련 테스트
+│   ├── test_login.py               # 로그인 테스트
+│   ├── test_notices.py             # 단일 페이지 공고 목록·상세 파싱 테스트
+│   ├── test_all_notices.py         # 전체 공고 수집(페이지 순회) 테스트
+│   └── test_request.py             # 요청 관련 테스트
 ├── docs/
-│   ├── code/                 # 코드 설명 문서
-│   └── guide/                # 라이브러리 가이드 (requests, bs4, pytest 등)
-├── main.py                   # 진입점 (미구현)
-├── pyproject.toml            # 패키지 빌드 설정
-├── .env                      # 환경변수 (student_no, ssu_pw, user_agent) - git 제외
+│   ├── code/
+│   │   ├── crawler.py.md           # SsupathCrawler 코드 문서
+│   │   ├── notice_list_html_structure.md   # 공고 목록 HTML 구조
+│   │   └── notice_detail_html_structure.md # 공고 상세 HTML 구조
+│   └── guide/
+│       ├── beautifulsoup.md
+│       ├── requests-guide.md
+│       ├── pytest_guide.md
+│       ├── ssu-sso-login-with-requests.md
+│       ├── ssu-path-request-headers.md
+│       ├── debug-get-detail-semester.md    # 학기 파싱 버그 디버깅 기록
+│       └── debug-get-detail-whitespace.md  # 공백/\xa0 정규화 디버깅 기록
+├── html/                           # 파싱 개발용 오프라인 HTML 샘플
+│   ├── notice_list.html
+│   ├── notice_detail.html
+│   ├── notice_detail2.html
+│   ├── end_page_html.html
+│   └── ptkorea.html
+├── main.py                         # 진입점 (미구현)
+├── pyproject.toml                  # 패키지 빌드 설정
+├── .env                            # 환경변수 (student_no, ssu_pw, user_agent) - git 제외
 └── .gitignore
 ```
 
@@ -60,15 +77,18 @@ ssunoti_server/
 
 ### 완료
 - `SsupathCrawler.login()` — SSU SSO 3단계 로그인 (ASPSESSIONID → sToken → JSESSIONID)
-- `SsupathCrawler.get_current_page_notices()` — 공고 목록 파싱
-- `SsupathCrawler.get_notice_url()` — 공고 상세 URL 생성
+- `SsupathCrawler.is_session_valid()` — 세션 유효성 확인 (div.lica_wrap 감지)
+- `SsupathCrawler.get_all_notices(year, status, semester)` — 페이지 순회 전체 공고 수집
+- `SsupathCrawler.get_current_page_notices(url)` — 단일 페이지 공고 목록 파싱, NoDataError
+- `SsupathCrawler.get_notice_url(notice)` — 공고 상세 URL 생성
+- `SsupathCrawler.get_detail(url)` — 공고 상세 페이지 파싱 (27개 필드)
 - `build_url()` — URL + query params 조합 유틸
 
 ### 미구현
-- `SsupathCrawler.get_detail()` — 공고 상세 내용 파싱 (stub)
 - Firebase Admin SDK 연동 (`firebase-admin`)
 - 스케줄러 (`apscheduler`)
 - FCM 푸시 알림 발송
+- `main.py` 진입점
 
 ---
 
@@ -77,6 +97,8 @@ ssunoti_server/
 - **Collection**: `notices`
 - **Document ID**: `{notice_id}` (SSUPath 게시글 번호, 중복 방지)
 - **Fields**: `title`, `url`, `content`, `deadline` (Timestamp), `current_capacity`, `total_capacity`, `is_closing_soon`, `notified_deadline`, `created_at`
+
+자세한 설계: `docs/firestroe_design.md`
 
 ---
 
