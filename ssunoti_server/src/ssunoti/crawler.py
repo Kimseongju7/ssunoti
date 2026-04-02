@@ -18,6 +18,27 @@ class NoDataError(Exception):
 
 
 class SsupathCrawler:
+    """SSUPath 비교과 포털 크롤러.
+
+    Public API:
+        login()                      — SSU SSO 3단계 로그인
+        is_session_valid()           — 세션 유효성 확인
+        get_all_notices(...)         — 조건에 맞는 전체 공고 목록 수집 (페이지 순회)
+        get_current_page_notices()   — 단일 페이지 공고 목록 파싱
+        get_notice_url(notice)       — 공고 딕셔너리 → 상세 페이지 URL
+        get_detail(url)              — 공고 상세 페이지 파싱
+
+    Internal helpers:
+        _ensure_session()            — 10분 캐시 기반 세션 보장, 만료 시 자동 재로그인
+        _parse_notice(li)            — li 요소 → 공고 딕셔너리
+        _parse_period(str)           — '시작~종료' 문자열 → {"start", "end"}
+        _parse_semester(str)         — '2026년 1학기' → {"year", "term"}
+        _parse_attachments(td)       — 첨부파일 td → [{name, url}]
+        _parse_course_info(block)    — 강좌 기본정보 블록 파싱
+        _parse_session(block)        — 회차 블록 파싱
+        _build_field_map(tbody)      — th[scope=row] → td 매핑 (키 공백 정규화)
+        _td_text(field_map, key)     — field_map 텍스트 추출 (\xa0·\n\t 정규화)
+    """
 
     SSO_LOGIN_PAGE = "https://smartid.ssu.ac.kr/Symtra_sso/smln.asp"
     SSO_LOGIN_PROCESS = "https://smartid.ssu.ac.kr/Symtra_sso/smln_pcs.asp"
