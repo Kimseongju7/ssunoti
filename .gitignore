@@ -3,3 +3,10 @@
 
 # IDE
 .idea/
+
+# 크롤링 개발용 오프라인 HTML 샘플
+# 로그인된 세션에서 저장된 페이지라 실계정 학번이 포함되어 있다. 커밋 금지.
+ssunoti_server/html/
+
+# Ouroboros 로컬 도구 상태
+.ouroboros/
