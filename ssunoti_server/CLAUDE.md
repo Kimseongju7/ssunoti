@@ -66,7 +66,8 @@ ssunoti_server/
 │   ├── end_page_html.html
 │   └── ptkorea.html
 ├── main.py                         # 진입점 (미구현)
-├── pyproject.toml                  # 패키지 빌드 설정
+├── pyproject.toml                  # 패키지 빌드 설정 · 의존성 선언(의도)
+├── uv.lock                         # uv 잠금 파일 · 정확한 버전 고정(확정) - 커밋 대상
 ├── .env                            # 환경변수 (student_no, ssu_pw, user_agent) - git 제외
 └── .gitignore
 ```
@@ -106,11 +107,12 @@ ssunoti_server/
 
 | 구분 | 기술 |
 |---|---|
-| 언어 | Python 3.x |
+| 언어 | Python (`requires-python >= 3.10`) |
+| 패키지·환경 관리 | `uv` (`uv.lock` 으로 버전 고정) |
 | 크롤링 | `requests`, `BeautifulSoup4` |
-| Firebase | `firebase-admin` (예정) |
-| 스케줄링 | `apscheduler` (예정) |
-| 테스트 | `pytest` |
+| Firebase | `firebase-admin` |
+| 스케줄링 | `APScheduler` (`>=3.6.0,<4.0.0`) |
+| 테스트 | `pytest` (`dev` extra) |
 | 환경변수 | `python-dotenv` |
 
 ---
@@ -136,5 +138,19 @@ user_agent=브라우저 User-Agent
 ## 개발 환경
 
 - IDE: PyCharm
-- 가상환경: `.venv/` (프로젝트 내 관리)
-- 테스트 실행: `pytest tests/`
+- 패키지·가상환경: **`uv` 로 통일**. `.venv/` 는 `uv` 가 관리하므로 직접 만들거나
+  `pip install` 하지 않는다. `uv.lock` 이 정본이며 커밋한다.
+
+```bash
+cd ssunoti_server
+
+uv sync --extra dev          # .venv 생성·동기화 (개발 의존성 포함)
+uv run pytest tests/         # 테스트 실행 (activate 불필요)
+uv add <패키지>              # 의존성 추가 (pyproject.toml + uv.lock 동시 갱신)
+uv lock --upgrade            # 잠긴 버전 갱신
+```
+
+- `activate` 는 필요 없다. `uv run` 이 알아서 프로젝트 환경에서 실행한다.
+- **`python -m pytest` 로 적지 않는다.** 이 개발 환경에는 `python` 이 없고 `python3` 만
+  있으며(PEP 394), 게다가 어느 인터프리터인지 activate 여부에 따라 달라진다.
+  자동화된 검증 명령에는 해석이 하나뿐인 `uv run pytest` 를 쓴다.
