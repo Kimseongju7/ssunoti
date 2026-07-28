@@ -46,7 +46,7 @@ ssunoti_server/
 │       ├── crawler.py              # SsupathCrawler (SSO 로그인, 목록/상세 크롤링)
 │       ├── store.py                # NoticeStore — Firestore upsert 계층
 │       ├── notifier.py             # NoticeNotifier — FCM 발송 + 신규 공고 사이클
-│       ├── scheduler.py            # NoticeScheduler — apscheduler 잡 3종
+│       ├── scheduler.py            # NoticeScheduler — 주기 잡 2종 + 초기 적재
 │       └── utils.py                # build_url() URL 빌더 유틸
 ├── tests/
 │   ├── conftest.py                 # pytest 터미널 요약 훅
@@ -78,7 +78,7 @@ ssunoti_server/
 │   ├── notice_detail2.html
 │   ├── end_page_html.html
 │   └── ptkorea.html
-├── main.py                         # 진입점 — Firebase 초기화 + 스케줄러 기동
+├── main.py                         # 진입점 — --backfill 1회 적재 / 기본은 상주 실행
 ├── pyproject.toml                  # 패키지 빌드 설정 · 의존성 선언(의도)
 ├── uv.lock                         # uv 잠금 파일 · 정확한 버전 고정(확정) - 커밋 대상
 ├── .env                            # 환경변수 (student_no, ssu_pw, user_agent) - git 제외
@@ -103,28 +103,29 @@ ssunoti_server/
   docId=`notice_id`, `created_at` 최초 1회만 기록, 비숫자 값 정규화
 - `NoticeNotifier.process_new_notices()` (`notifier.py`) — 신규 판정 → FCM topic
   브로드캐스트 → Firestore 쓰기. `backfill=True` 시 발송 없이 저장만
-- `NoticeScheduler.setup()` (`scheduler.py`) — apscheduler 잡 3종 등록, `max_instances=1`
-- `main.py` — Firebase Admin SDK 초기화 + `BackgroundScheduler` 기동 + 상주 루프
+- `NoticeScheduler.setup()` (`scheduler.py`) — apscheduler 잡 2종 등록, `max_instances=1`
+- `NoticeScheduler.run_backfill()` — 초기 적재 1회 (주기 잡 아님, 예외 전파)
+- `main.py` — Firebase 초기화 + `--backfill` 1회 적재 / 기본은 스케줄러 상주 실행
 
 ### 검증 완료
 - `encSddpbSeq` 가 로그인 세션 간에 동일함을 실측 확인 (불일치 0건).
   `notice_id` 를 Firestore docId 로 쓰는 전략이 유효하다.
   근거: `docs/ac1_notice_id_stability.md`
 
-### 알려진 문제 (미해결)
+### 해결된 문제 (기록)
 
-1. **backfill 모드에 도달할 경로가 없다.**
-   `NoticeNotifier.process_new_notices(backfill=True)` 는 구현·테스트되어 있으나
-   `main.py` 와 `scheduler.py` 어디에서도 호출하지 않는다.
-   `NoticeScheduler.collect_new_notices()` 는 항상 기본값(`backfill=False`)으로 부른다.
-   → **비어 있는 Firestore 로 처음 기동하면 모집중 공고 전량이 신규로 판정되어
-   전부 푸시가 나간다.** 초기 적재용 진입점(CLI 플래그 등)이 필요하다.
+- **backfill 진입점 부재** → `main.py --backfill` 과 `NoticeScheduler.run_backfill()` 추가.
+  초기 적재는 주기 잡이 아니며, 실패 시 예외를 삼키지 않고 전파한다
+  (부분 적재 상태로 상주 실행에 들어가면 남은 공고가 전량 푸시되므로).
+- **`update_capacity` / `update_deadline` 중복** → 마감 전용 cron 잡을 제거하고
+  15분 잡을 `update_notices` 로 통합. 잡 3개 → 2개, 시간당 크롤링 5회 유지.
 
-2. **`update_capacity` 와 `update_deadline` 이 동일한 동작을 한다.**
-   둘 다 `get_all_notices(year, status="RS02")` 후 `store.upsert_many()` 를 호출한다.
-   15분 잡이 이미 `deadline` 을 포함한 전 필드를 갱신하므로 매일 09:00 잡은 잉여다.
-   또한 15분마다 전체 페이지를 순회하므로 학교 서버에 시간당 4회 전수 크롤링이 발생한다.
-   "신규 수집 주기 1시간 이상" 제약의 문구는 지켰으나 부하 배려라는 의도와 어긋난다.
+### 남은 부하 이슈 (판단 보류)
+
+15분 잡이 전수 페이지를 순회하므로 시간당 전수 크롤링이 5회 발생한다.
+"신규 수집 주기 1시간 이상" 이라는 부하 배려 제약과 긴장 관계에 있다.
+현재 15분 신선도를 실제로 쓰는 소비자는 없다 — 정원 임박 알림이 찜 기능 종속으로
+범위 밖이기 때문이다. 찜 기능을 설계할 때 이 주기를 함께 재검토한다.
 
 ### 미구현
 - Flutter 앱 일체
@@ -211,10 +212,24 @@ GOOGLE_APPLICATION_CREDENTIALS=<서비스 계정 키 JSON 파일의 절대 경�
 | 잡 ID | 트리거 | 하는 일 |
 |---|---|---|
 | `collect_new_notices` | interval 60분 | 신규 판정 → **FCM 발송 → Firestore 쓰기** |
-| `update_capacity` | interval 15분 | 전체 재수집 후 `upsert_many()` (원시값 갱신) |
-| `update_deadline` | cron 매일 09:00 `Asia/Seoul` | 전체 재수집 후 `upsert_many()` |
+| `update_notices` | interval 15분 | 전체 재수집 후 `upsert_many()` — 신청자·대기자·정원·**마감** 원시값 갱신 |
 
 모든 잡은 `max_instances=1` — 이전 실행이 안 끝났으면 다음 트리거를 건너뛴다.
+학교 서버 부하는 시간당 전수 페이지 순회 5회(15분×4 + 60분×1)이다.
+
+> 마감 전용 잡(cron 매일 09:00)은 **제거했다.** 15분 잡이 같은 크롤링 결과로
+> `deadline` 까지 이미 갱신하므로, 코드가 한 글자도 다르지 않은 중복이었다.
+
+초기 적재는 주기 잡이 아니다. `NoticeScheduler.run_backfill()` 을 CLI 로 1회 호출한다:
+
+```bash
+uv run python main.py --backfill   # 저장만, FCM 0건, 실행 후 종료
+uv run python main.py              # 상주 실행
+```
+
+**빈 Firestore 로 처음 시작할 때는 반드시 `--backfill` 을 먼저 1회 실행한다.**
+신규 판정 기준이 "문서가 존재하지 않음" 이므로, 건너뛰면 모집중 공고 전량이
+신규로 판정되어 전부 푸시가 나간다.
 
 > 알림은 **신규 공고 1종만** 발송한다. 정원 임박·마감 임박 알림은 찜 기능에
 > 종속되므로 Flutter 앱 구현 이후로 미뤘다. 옛 계획의 "90% 도달 시 알림" 은
@@ -225,8 +240,6 @@ FCM 은 **topic 브로드캐스트만** 사용한다 (`notifier.py`):
 - topic 이름: `new_notices` — Flutter 앱이 이 topic 을 구독해야 한다.
 - 기기 토큰을 수집하지도, payload 에 포함하지도 않는다. 사용자별 발송 경로가 없다.
 
-> `update_capacity` 와 `update_deadline` 이 사실상 같은 동작을 한다.
-> 위 "알려진 문제" 2번 참조.
 
 ---
 
