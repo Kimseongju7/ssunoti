@@ -4,6 +4,7 @@
 
 | 문서 | 내용 |
 |---|---|
+| `docs/adr/` | **아키텍처 결정 기록.** 왜 그렇게 정했는가 — 갱신하지 않는다 |
 | `ssunoti_server/CLAUDE.md` | 백엔드 아키텍처 · 파일 구조 · 구현 현황 · Firestore 설계 |
 | `ssunoti_server/SSUPATH_URL_ANALYSIS.md` | SSUPath URL 구조 분석 |
 | `ssunoti_server/docs/` | 크롤러 코드 문서, HTML 구조, 디버깅 기록 |

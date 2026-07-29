@@ -175,6 +175,12 @@ HTML 샘플이 필요한데 `html/` 은 실계정 학번이 박혀 gitignore 되
 
 ### 확정된 설계 결정 (되돌리지 말 것)
 
+> 아래 결정의 **근거·기각된 대안·대가**는 ADR 에 있다. 되돌리기 전에 반드시 읽을 것.
+> [ADR-0001](../docs/adr/0001-no-derived-state-in-firestore.md) 파생 상태 미저장 ·
+> [ADR-0002](../docs/adr/0002-send-before-persist-at-least-once.md) 발송 후 저장 ·
+> [ADR-0003](../docs/adr/0003-capacity-nullable-counts-zero.md) capacity 만 nullable
+
+
 - **파생 상태를 저장하지 않는다.** `is_closing_soon`, `notified_deadline`,
   `current_capacity`, `total_capacity` 같은 필드는 **의도적으로 없앴다.**
   SSUPath 에는 취소 기능이 없고 정원은 증원될 수 있으며 마감은 연장될 수 있다.
