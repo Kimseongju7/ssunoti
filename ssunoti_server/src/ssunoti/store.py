@@ -105,6 +105,23 @@ class NoticeStore:
         """
         self._db = db
 
+    def exists(self, notice_id: str) -> bool:
+        """notice_id 문서가 notices 컬렉션에 존재하는지 반환한다.
+
+        문서의 존재 자체가 "이미 관측·알림 처리된 공고"를 뜻하므로,
+        이 메서드가 신규 판별의 유일한 근거다.
+
+        Args:
+            notice_id: docId (encSddpbSeq 32자 hex)
+
+        Returns:
+            문서가 있으면 True. notice_id 가 비었으면 False.
+        """
+        if not notice_id:
+            return False
+        snapshot = self._db.collection(_COLLECTION).document(notice_id).get()
+        return bool(snapshot.exists)
+
     def upsert(self, notice: dict) -> None:
         """공고 dict 를 notices 컬렉션에 upsert 한다.
 

@@ -120,6 +120,25 @@ ssunoti_server/
 - **`update_capacity` / `update_deadline` 중복** → 마감 전용 cron 잡을 제거하고
   15분 잡을 `update_notices` 로 통합. 잡 3개 → 2개, 시간당 크롤링 5회 유지.
 
+### 테스트 커버리지
+
+`uv run --with pytest-cov pytest tests/ --cov=src/ssunoti --cov-report=term-missing`
+(실접속 통합 테스트 제외, 신규 5파일 기준)
+
+| 모듈 | 커버리지 |
+|---|---|
+| `notifier.py` | 98% |
+| `store.py` | 97% |
+| `scheduler.py` | 92% |
+| `utils.py` | 100% |
+| `crawler.py` | **15%** |
+| 전체 | 47% |
+
+전체 수치를 끌어내리는 건 `crawler.py` 하나다. 오프라인 파싱 테스트를 붙이려면
+HTML 샘플이 필요한데 `html/` 은 실계정 학번이 박혀 gitignore 되어 있어,
+그대로 쓰면 로컬에서만 통과하고 CI·타 개발자 환경에서 깨진다.
+**학번을 마스킹한 샘플을 커밋 가능한 형태로 새로 만드는 것이 선결 과제다.**
+
 ### 남은 부하 이슈 (판단 보류)
 
 15분 잡이 전수 페이지를 순회하므로 시간당 전수 크롤링이 5회 발생한다.

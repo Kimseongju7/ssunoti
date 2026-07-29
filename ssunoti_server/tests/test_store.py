@@ -109,6 +109,37 @@ def store(db: FakeFirestoreClient) -> NoticeStore:
     return NoticeStore(db)
 
 
+# ── 존재 여부 조회 (신규 판별의 유일한 근거) ──────────────────────────────────
+
+class TestExists:
+    """NoticeStore.exists() 검증.
+
+    문서 존재 = 이미 알림 처리된 공고. 이 판정이 틀리면 중복 발송 또는 유실이 난다.
+    """
+
+    def test_returns_false_when_document_absent(self, store: NoticeStore) -> None:
+        """저장된 적 없는 notice_id 는 False 다."""
+        assert store.exists("0a1b2c3d4e5f60718293a4b5c6d7e8f9") is False
+
+    def test_returns_true_after_upsert(self, store: NoticeStore) -> None:
+        """upsert 직후 같은 notice_id 는 True 다."""
+        notice = _make_notice()
+
+        store.upsert(notice)
+
+        assert store.exists(notice["notice_id"]) is True
+
+    def test_returns_false_for_other_id(self, store: NoticeStore) -> None:
+        """다른 notice_id 는 영향받지 않는다."""
+        store.upsert(_make_notice(notice_id="a" * 32))
+
+        assert store.exists("b" * 32) is False
+
+    def test_returns_false_for_empty_id(self, store: NoticeStore) -> None:
+        """notice_id 가 비면 조회 없이 False 다."""
+        assert store.exists("") is False
+
+
 # ── 기본 저장 동작 ────────────────────────────────────────────────────────────
 
 class TestUpsertBasic:

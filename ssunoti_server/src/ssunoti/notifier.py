@@ -17,7 +17,6 @@ from ssunoti.store import NoticeStore
 logger = logging.getLogger(__name__)
 
 _TOPIC = "new_notices"
-_COLLECTION = "notices"
 _NOTIFICATION_TITLE = "새 비교과 공고"
 
 
@@ -45,9 +44,7 @@ class NoticeNotifier:
 
     def _is_new_notice(self, notice_id: str) -> bool:
         """notice_id 에 해당하는 Firestore 문서가 없으면 True (신규 공고)."""
-        doc_ref = self._store._db.collection(_COLLECTION).document(notice_id)
-        snapshot = doc_ref.get()
-        return not snapshot.exists
+        return not self._store.exists(notice_id)
 
     def _send_topic_broadcast(self, notice: dict) -> None:
         """FCM topic 브로드캐스트를 발송한다.
