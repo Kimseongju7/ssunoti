@@ -1,45 +1,60 @@
 import 'package:flutter/material.dart';
 
-/// Linear.app 디자인 시스템 토큰.
+/// Linear.app 디자인 시스템 토큰 — 라이트 변형.
 ///
 /// 값의 근거는 저장소 루트 DESIGN.md 에 있다. 바꾸려면 문서를 먼저 고친다 —
 /// 문서가 정본이고 코드가 사본이다.
+///
+/// Linear 원본은 라이트 모드를 지원하지 않는다고 명시한다. 다만 Inverse
+/// 토큰(#FFFFFF, #F5F6F6, #F6F7F7, #000000)은 문서화되어 있어 그것을 기준으로
+/// 삼았다. 원본에 없는 중간 단계는 파생값이며 각 항목에 표시했다.
 abstract final class SsuColors {
-  // ── Brand & Accent ───────────────────────────────────────────────────────
+  // ── Brand & Accent (다크와 동일) ─────────────────────────────────────────
   /// 희소 자원이다. 브랜드·주요 CTA·포커스 링·찜 활성에만 쓴다.
   static const accent = Color(0xFF5E6AD2);
   static const accentHover = Color(0xFF828FFF);
   static const accentFocus = Color(0xFF5E69D1);
 
   // ── Surface Ladder (4단계. 건너뛰지 않는다) ─────────────────────────────
-  /// 순수 검정이 아니다. 옅은 청색 기운이 의도된 것.
-  static const canvas = Color(0xFF010102);
-  static const surface1 = Color(0xFF0F1011);
-  static const surface2 = Color(0xFF141516);
-  static const surface3 = Color(0xFF18191A);
-  static const surface4 = Color(0xFF191A1B);
+  /// 원본 Inverse Canvas
+  static const canvas = Color(0xFFFFFFFF);
 
-  // ── Hairlines ────────────────────────────────────────────────────────────
-  static const hairline = Color(0xFF23252A);
-  static const hairlineStrong = Color(0xFF34343A);
-  static const hairlineTertiary = Color(0xFF3E3E44);
+  /// 원본 Inverse Surface-1
+  static const surface1 = Color(0xFFF5F6F6);
+
+  /// 파생 — 원본 Inverse Surface-2(#F6F7F7)는 surface1 과 1단위 차이라
+  /// 화면에서 구분되지 않는다. 실제 위계가 보이도록 낮췄다.
+  static const surface2 = Color(0xFFEDEEF0);
+
+  /// 파생
+  static const surface3 = Color(0xFFE7E8EB);
+
+  /// 파생
+  static const surface4 = Color(0xFFE1E2E6);
+
+  // ── Hairlines (파생) ─────────────────────────────────────────────────────
+  static const hairline = Color(0xFFE3E4E8);
+  static const hairlineStrong = Color(0xFFD2D4DA);
+  static const hairlineTertiary = Color(0xFFC4C7CE);
 
   // ── Ink ──────────────────────────────────────────────────────────────────
-  static const ink = Color(0xFFF7F8F8);
-  static const inkMuted = Color(0xFFD0D6E0);
-  static const inkSubtle = Color(0xFF8A8F98);
+  /// 원본 Inverse Ink 는 #000000 이지만, 캔버스를 순수 검정으로 쓰지 않는
+  /// 원본 규칙을 뒤집어 적용해 순수 검정 글자도 쓰지 않는다.
+  static const ink = Color(0xFF0D0E10);
+
+  static const inkMuted = Color(0xFF3C4149);
+  static const inkSubtle = Color(0xFF6B7280);
 
   /// 비활성, 각주, 종료 공고
-  static const inkTertiary = Color(0xFF62666D);
+  static const inkTertiary = Color(0xFF9CA3AF);
 
   // ── Status Tags ──────────────────────────────────────────────────────────
-  // Linear 마케팅 규칙은 2차 색상을 금지하지만, 원본이 명시하듯 제품 UI 의
-  // 상태 태그는 예외다. 대신 색을 면적으로 쓰지 않고 6px 점으로만 쓴다.
-  // 배지 배경은 상태와 무관하게 항상 surface2 다.
-  static const tagOpen = Color(0xFF4EA7FC);
-  static const tagAlways = Color(0xFF27A644);
-  static const tagWarning = Color(0xFFF2994A);
-  static const tagClosed = Color(0xFF62666D);
+  // 색을 면적으로 쓰지 않고 6px 점으로만 쓴다. 배지 배경은 상태와 무관하게
+  // 항상 surface2 다. 밝은 배경에서 읽히도록 다크 변형보다 어둡게 잡았다.
+  static const tagOpen = Color(0xFF2F80ED);
+  static const tagAlways = Color(0xFF1E8E3E);
+  static const tagWarning = Color(0xFFD9730D);
+  static const tagClosed = Color(0xFF9CA3AF);
 }
 
 /// 간격 스케일. Linear 원본 그대로.

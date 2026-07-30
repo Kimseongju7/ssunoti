@@ -3,24 +3,39 @@
 > 기반: [Linear.app Design System](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/linear.app/DESIGN.md)
 > 개정일: 2026-07-30
 
-Linear 의 다크 캔버스 시스템을 SSUNoti 에 옮긴 것이다. 원본을 그대로 쓰지 않고
-두 곳을 의도적으로 바꿨다 — **상태 색 표현 방식**과 **한글 타이포그래피**.
-바꾼 이유는 각 절에 적었다.
+Linear 의 시스템 구조를 SSUNoti 에 옮긴 것이다. 원본을 그대로 쓰지 않고
+세 곳을 의도적으로 바꿨다 — **명암 모드**, **상태 색 표현 방식**,
+**한글 타이포그래피**. 바꾼 이유는 각 절에 적었다.
 
 ---
 
 ## 1. Visual Theme & Atmosphere
 
-**성격** — 거의 검은 캔버스 위에 옅은 회색 글자, 라벤더 강조 하나. 장식이 없고
+**성격** — 흰 캔버스 위에 짙은 회색 글자, 라벤더 강조 하나. 장식이 없고
 정보가 주인공이다. 깊이는 그림자가 아니라 **표면 사다리 + 1px 실선**으로 만든다.
 
 | 축 | 위치 |
 |---|---|
-| 모드 | **다크 전용.** 라이트 모드를 만들지 않는다 |
-| 캔버스 | `#010102` — 순수 검정이 아니다. 미세한 청색 기운이 의도된 것 |
+| 모드 | **라이트.** 원본에서 바꾼 부분 ⓪ — 아래 참조 |
+| 캔버스 | `#FFFFFF` (원본 Inverse Canvas) |
 | 채도 | 극도로 낮음. 라벤더는 희소 자원 |
 | 모서리 | 8px 기본. pill 은 상태 배지에만 |
 | 그림자 | **없음.** 표면 단계와 실선으로만 위계를 만든다 |
+
+### 원본에서 바꾼 부분 ⓪ — 명암 모드
+
+Linear 원본은 *"Don't create a light-mode marketing version"* 이라고 명시하고
+Known Limitations 에도 *"Light mode is not supported or specified"* 라고 적는다.
+
+**이 프로젝트는 라이트 모드를 쓴다.** 학사 포털 사용자가 SSUPath(흰 배경)와
+번갈아 보는 앱이라, 다크로 두면 두 화면을 오갈 때마다 눈이 적응해야 한다.
+
+색을 임의로 지어내지 않기 위해 원본이 **문서화한 Inverse 토큰**을 기준으로 삼았다:
+`Inverse Canvas #FFFFFF`, `Inverse Surface-1 #F5F6F6`, `Inverse Ink #000000`.
+원본에 없는 중간 단계는 파생값이며 2절에 표시했다.
+
+**유지되는 것** — 표면 사다리 구조, 그림자 없음, 라벤더의 희소성, 상태 점 방식,
+반경·간격 스케일, 타입 스케일. 뒤집은 것은 명암뿐이다.
 
 **이 앱에서의 의미** — 공고 목록은 텍스트 덩어리다. 배경이 조용할수록 제목이
 읽힌다. 색을 뿌리는 대신 **상태를 작은 점 하나로** 말한다.
@@ -42,30 +57,36 @@ Linear 의 다크 캔버스 시스템을 SSUNoti 에 옮긴 것이다. 원본을
 
 ### Surface Ladder (4단계. 건너뛰지 않는다)
 
+| 토큰 | Hex | 출처 | 용도 |
+|---|---|---|---|
+| `canvas` | `#FFFFFF` | 원본 Inverse Canvas | 기본 배경, 목록 행 |
+| `surface1` | `#F5F6F6` | 원본 Inverse Surface-1 | 카드, 정보 패널 |
+| `surface2` | `#EDEEF0` | **파생** | 상태 배지, 강조 카드 |
+| `surface3` | `#E7E8EB` | **파생** | 드롭다운 |
+| `surface4` | `#E1E2E6` | **파생** | 가장 들린 표면 |
+
+> 원본 `Inverse Surface-2` 는 `#F6F7F7` 로 `surface1` 과 1단위 차이다.
+> 마케팅 타일에는 충분하지만 앱에서는 두 단계가 구분되지 않아 낮춰 잡았다.
+
+### Hairlines (전부 파생)
+
 | 토큰 | Hex | 용도 |
 |---|---|---|
-| `canvas` | `#010102` | 기본 배경, 목록 행 |
-| `surface1` | `#0F1011` | 카드, 정보 패널 |
-| `surface2` | `#141516` | 강조·hover 카드, 상태 배지 |
-| `surface3` | `#18191A` | 바텀 네비게이션, 드롭다운 |
-| `surface4` | `#191A1B` | 가장 들린 표면 |
-
-### Hairlines
-
-| 토큰 | Hex | 용도 |
-|---|---|---|
-| `hairline` | `#23252A` | 기본 1px 경계 · 목록 구분선 |
-| `hairlineStrong` | `#34343A` | 포커스 링 경계 |
-| `hairlineTertiary` | `#3E3E44` | 중첩 표면 경계 |
+| `hairline` | `#E3E4E8` | 기본 1px 경계 · 목록 구분선 |
+| `hairlineStrong` | `#D2D4DA` | 포커스 링 경계 |
+| `hairlineTertiary` | `#C4C7CE` | 중첩 표면 경계 |
 
 ### Ink
 
 | 토큰 | Hex | 용도 |
 |---|---|---|
-| `ink` | `#F7F8F8` | 제목, 본문 주요 |
-| `inkMuted` | `#D0D6E0` | 보조 메타 |
-| `inkSubtle` | `#8A8F98` | 3차 · 비선택 상태 |
-| `inkTertiary` | `#62666D` | 비활성, 각주, **종료 공고** |
+| `ink` | `#0D0E10` | 제목, 본문 주요 |
+| `inkMuted` | `#3C4149` | 보조 메타 |
+| `inkSubtle` | `#6B7280` | 3차 · 비선택 상태 |
+| `inkTertiary` | `#9CA3AF` | 비활성, 각주, **종료 공고** |
+
+> 원본 `Inverse Ink` 는 `#000000` 이지만 순수 검정을 쓰지 않았다.
+> 캔버스를 순수 검정으로 쓰지 않는다는 원본 규칙을 뒤집어 적용한 것이다.
 
 ### Status Tags — 원본에서 바꾼 부분 ①
 
@@ -78,13 +99,16 @@ in-product surfaces only"*. **SSUNoti 는 제품 UI다.**
 
 | 토큰 | Hex | 의미 |
 |---|---|---|
-| `tagOpen` | `#4EA7FC` | 모집중 |
-| `tagAlways` | `#27A644` | 상시모집 (원본 Semantic Success) |
-| `tagWarning` | `#F2994A` | 마감 임박 · 정원 임박 |
-| `tagClosed` | `#62666D` | 종료 · 마감됨 |
+| `tagOpen` | `#2F80ED` | 모집중 |
+| `tagAlways` | `#1E8E3E` | 상시모집 |
+| `tagWarning` | `#D9730D` | 마감 임박 · 정원 임박 |
+| `tagClosed` | `#9CA3AF` | 종료 · 마감됨 |
 
 > 점은 6px 원. 배지 배경은 상태와 무관하게 항상 `surface2` 다.
 > 이렇게 하면 목록에 색 덩어리가 생기지 않는다.
+>
+> 밝은 배경에서 읽히도록 다크 변형(`#4EA7FC` / `#27A644` / `#F2994A`)보다
+> 어둡게 잡았다. 6px 점은 면적이 작아 대비가 부족하면 그냥 안 보인다.
 
 ---
 
@@ -133,8 +157,8 @@ Inter, Geist Sans, JetBrains Mono.
 ### Status Badge (원본 `status-badge` 를 확장)
 
 ```
-배경   : surface2  #141516     ← 상태와 무관하게 고정
-글자   : inkMuted  #D0D6E0
+배경   : surface2  #EDEEF0     ← 상태와 무관하게 고정
+글자   : inkMuted  #3C4149
 타입   : caption (12px/400)
 패딩   : 3px 8px  (원본 2px 8px 에서 터치 여유)
 반경   : pill
@@ -146,19 +170,19 @@ Inter, Geist Sans, JetBrains Mono.
 원본에 이미 목록 행 컴포넌트가 있다. 그대로 쓴다.
 
 ```
-배경       : canvas #010102
-글자       : ink #F7F8F8
+배경       : canvas #FFFFFF
+글자       : ink #0D0E10
 패딩       : 20px 16px   (원본 24px 0 을 모바일로 조정)
-하단 경계선 : 1px #23252A
+하단 경계선 : 1px #E3E4E8
 ```
 
-**종료 상태** — 제목을 `inkTertiary` `#62666D` 로 낮춘다. 숨기지 않는다.
+**종료 상태** — 제목을 `inkTertiary` `#9CA3AF` 로 낮춘다. 숨기지 않는다.
 
 ### Info Card (원본 `feature-card`)
 
 ```
-배경   : surface1 #0F1011
-경계선 : 1px #23252A
+배경   : surface1 #F5F6F6
+경계선 : 1px #E3E4E8
 반경   : 12px
 패딩   : 20px  (원본 24px 을 모바일로 조정)
 ```
@@ -168,8 +192,8 @@ Inter, Geist Sans, JetBrains Mono.
 | 종류 | 배경 | 글자 | 경계선 |
 |---|---|---|---|
 | Primary | `#5E6AD2` | `#FFFFFF` | 없음 |
-| Secondary | `#0F1011` | `#F7F8F8` | 1px `#23252A` |
-| Tertiary | `#010102` | `#F7F8F8` | 없음 |
+| Secondary | `#FFFFFF` | `#0D0E10` | 1px `#E3E4E8` |
+| Tertiary | `#FFFFFF` | `#0D0E10` | 없음 |
 
 ```
 타입 : button (14px/500/1.20)
@@ -181,18 +205,18 @@ hover: #828FFF   pressed: #5E69D1
 ### Bottom Navigation (원본 `top-nav` 를 하단으로)
 
 ```
-배경       : surface3 #18191A
-상단 경계선 : 1px #23252A
+배경       : canvas #FFFFFF
+상단 경계선 : 1px #E3E4E8
 높이       : 56px
-선택       : ink #F7F8F8 + accent 인디케이터
-비선택     : inkSubtle #8A8F98
-타입       : bodySm (13px/400)
+선택       : accent #5E6AD2 아이콘 + ink #0D0E10 라벨
+비선택     : inkSubtle #6B7280
+타입       : caption (12px/400)
 ```
 
 ### Favorite Toggle
 
 ```
-비활성 : inkSubtle #8A8F98, 외곽선 하트
+비활성 : inkSubtle #6B7280, 외곽선 하트
 활성   : accent #5E6AD2, 채운 하트
 ```
 
@@ -233,8 +257,8 @@ pill 9999   상태 배지, 탭
 | 768–1023 | 1열 + 최대폭 720 중앙 |
 | ≥ 1024 | 최대폭 1280, 좌 목록 / 우 상세 2분할 |
 
-**여백 철학** — 어두운 캔버스 자체가 숨 쉴 공간이다. 흰 여백으로 구획을 나누지
-않고 **표면을 한 단계 들어 올려** 나눈다.
+**여백 철학** — 구획은 여백이 아니라 **표면 단계와 실선**으로 나눈다.
+같은 흰 배경 위에서 `surface1` 한 단계와 1px 실선이 경계를 만든다.
 
 ---
 
@@ -258,7 +282,7 @@ pill 9999   상태 배지, 탭
 
 ### Do
 
-- 캔버스는 `#010102` 에 고정한다. 옅은 청색 기운은 의도된 것이다
+- 캔버스는 `#FFFFFF` 에 고정한다
 - 라벤더는 **브랜드·주요 CTA·포커스·찜 활성**에만 쓴다
 - 표면 4단계를 순서대로 쓴다
 - 디스플레이 600 / 본문 400 조합을 지킨다
@@ -268,10 +292,12 @@ pill 9999   상태 배지, 탭
 
 ### Don't
 
-- ❌ **라이트 모드를 만들지 않는다**
 - ❌ 카드나 섹션 배경을 라벤더로 채우지 않는다
-- ❌ 순수 검정 `#000000` 을 캔버스로 쓰지 않는다
+- ❌ 순수 검정 `#000000` 을 글자색으로 쓰지 않는다
 - ❌ 주요 버튼을 pill 로 만들지 않는다
+- ❌ **`Center` 를 `bottomNavigationBar` 나 `appBar` 슬롯에 쓰지 않는다.**
+  세로 공간을 전부 차지해 본문 높이가 0 이 된다. 폭만 제한하려면
+  `Align(heightFactor: 1.0)` 을 쓴다
 - ❌ 그라디언트·스포트라이트 효과를 넣지 않는다
 - ❌ **한글에 -1.0px 이상의 음수 자간을 주지 않는다.** 글자가 뭉친다
 - ❌ **정원 미상(`capacity == null`)을 `0` 으로 표시하지 않는다.**
@@ -306,10 +332,10 @@ pill 9999   상태 배지, 탭
 
 ```
 accent   #5E6AD2   hover #828FFF   focus #5E69D1
-canvas   #010102   s1 #0F1011   s2 #141516   s3 #18191A   s4 #191A1B
-hairline #23252A   strong #34343A   tertiary #3E3E44
-ink      #F7F8F8   muted #D0D6E0   subtle #8A8F98   tertiary #62666D
-tag      open #4EA7FC · always #27A644 · warning #F2994A · closed #62666D
+canvas   #FFFFFF   s1 #F5F6F6   s2 #EDEEF0   s3 #E7E8EB   s4 #E1E2E6
+hairline #E3E4E8   strong #D2D4DA   tertiary #C4C7CE
+ink      #0D0E10   muted #3C4149   subtle #6B7280   tertiary #9CA3AF
+tag      open #2F80ED · always #1E8E3E · warning #D9730D · closed #9CA3AF
 ```
 
 ```
@@ -320,20 +346,20 @@ tag      open #4EA7FC · always #27A644 · warning #F2994A · closed #62666D
 
 ### 프롬프트 예시
 
-> SSUNoti 공고 목록 행을 만들어라. 배경 `#010102`, 그림자 없음, 하단
-> `1px solid #23252A`. 패딩 20×16. 제목은 17px/500/`#F7F8F8`, 자간 -0.2,
-> 2줄 말줄임. 아래에 상태 배지들: 배경은 전부 `#141516`, 글자 `#D0D6E0`
-> 12px, pill, 패딩 3×8, 좌측에 6px 색 점 — 모집중 `#4EA7FC`, 상시모집
-> `#27A644`, 마감임박 `#F2994A`, 종료 `#62666D`. 정원은 `신청/정원` 을
+> SSUNoti 공고 목록 행을 만들어라. 배경 `#FFFFFF`, 그림자 없음, 하단
+> `1px solid #E3E4E8`. 패딩 20×16. 제목은 17px/500/`#0D0E10`, 자간 -0.2,
+> 2줄 말줄임. 아래에 상태 배지들: 배경은 전부 `#EDEEF0`, 글자 `#3C4149`
+> 12px, pill, 패딩 3×8, 좌측에 6px 색 점 — 모집중 `#2F80ED`, 상시모집
+> `#1E8E3E`, 마감임박 `#D9730D`, 종료 `#9CA3AF`. 정원은 `신청/정원` 을
 > JetBrains Mono 로, null 이면 "정원 미정". 마감 3일 이내면 주황 점 +
 > 알람 아이콘 + `D-2`. 우측에 44×44 터치 영역 하트, 켜지면 `#5E6AD2`.
 
 ### 절대 규칙
 
-1. 라이트 모드 없음. 캔버스는 `#010102`
+1. 캔버스는 `#FFFFFF`. 글자에 순수 검정을 쓰지 않는다
 2. 라벤더는 브랜드·CTA·포커스·찜에만
 3. 그림자 없음 — 표면 사다리 + 실선
-4. 상태 배지 배경은 항상 `#141516`, 색은 점에만
+4. 상태 배지 배경은 항상 `#EDEEF0`, 색은 점에만
 5. `capacity == null` → "정원 미정". 절대 `0` 아님
 6. `deadline == null` → "상시모집". 절대 "오늘 마감" 아님
 7. 한글 음수 자간 -1.0px 초과 금지

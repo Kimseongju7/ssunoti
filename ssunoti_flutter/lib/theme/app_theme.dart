@@ -5,10 +5,12 @@ import 'tokens.dart';
 
 /// DESIGN.md 를 ThemeData 로 옮긴 것.
 ///
-/// **다크 전용이다.** Linear 는 라이트 모드를 만들지 않는다 — DESIGN.md 7절.
+/// Linear 구조(표면 사다리 · 그림자 없음 · 희소한 라벤더)를 유지하되
+/// 라이트 팔레트로 뒤집었다. 원본은 라이트 모드를 지원하지 않지만
+/// 문서화된 Inverse 토큰을 기준으로 삼았다 — DESIGN.md 2절.
 abstract final class AppTheme {
-  static ThemeData dark() {
-    const colorScheme = ColorScheme.dark(
+  static ThemeData light() {
+    const colorScheme = ColorScheme.light(
       primary: SsuColors.accent,
       onPrimary: Colors.white,
       secondary: SsuColors.accent,
@@ -19,14 +21,14 @@ abstract final class AppTheme {
       surfaceContainerHigh: SsuColors.surface2,
       surfaceContainerHighest: SsuColors.surface3,
       error: SsuColors.tagWarning,
-      onError: Colors.black,
+      onError: Colors.white,
       outline: SsuColors.hairline,
       outlineVariant: SsuColors.hairlineTertiary,
     );
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: SsuColors.canvas,
       dividerColor: SsuColors.hairline,
@@ -62,26 +64,26 @@ abstract final class AppTheme {
       ),
 
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: SsuColors.surface3,
+        backgroundColor: SsuColors.canvas,
         elevation: 0,
         height: 56,
-        indicatorColor: SsuColors.accent.withValues(alpha: 0.16),
+        indicatorColor: SsuColors.accent.withValues(alpha: 0.12),
         surfaceTintColor: Colors.transparent,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? SsuColors.ink : SsuColors.inkSubtle,
+            color: selected ? SsuColors.accent : SsuColors.inkSubtle,
             size: 20,
           );
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return _latin(
-            13,
+            12,
             selected ? FontWeight.w500 : FontWeight.w400,
             selected ? SsuColors.ink : SsuColors.inkSubtle,
-            1.5,
+            1.4,
           );
         }),
       ),
@@ -125,7 +127,7 @@ abstract final class AppTheme {
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          backgroundColor: SsuColors.surface1,
+          backgroundColor: SsuColors.canvas,
           foregroundColor: SsuColors.ink,
           side: const BorderSide(color: SsuColors.hairline),
           minimumSize: const Size.fromHeight(SsuLayout.minTouchTarget),
@@ -136,11 +138,10 @@ abstract final class AppTheme {
       ),
 
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: SsuColors.surface2,
-        contentTextStyle: _latin(13, FontWeight.w400, SsuColors.ink, 1.5),
+        backgroundColor: SsuColors.ink,
+        contentTextStyle: _latin(13, FontWeight.w400, SsuColors.canvas, 1.5),
         behavior: SnackBarBehavior.floating,
         shape: const RoundedRectangleBorder(
-          side: BorderSide(color: SsuColors.hairline),
           borderRadius: BorderRadius.all(Radius.circular(SsuRadius.md)),
         ),
       ),
@@ -149,7 +150,7 @@ abstract final class AppTheme {
         color: SsuColors.accent,
       ),
 
-      splashColor: SsuColors.accent.withValues(alpha: 0.10),
+      splashColor: SsuColors.accent.withValues(alpha: 0.08),
       highlightColor: SsuColors.surface1,
     );
   }

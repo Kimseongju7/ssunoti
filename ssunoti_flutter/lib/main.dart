@@ -50,8 +50,7 @@ class SsunotiApp extends StatelessWidget {
       title: 'SSUNoti',
       debugShowCheckedModeBanner: false,
       // 테마 값의 근거는 저장소 루트 DESIGN.md 에 있다.
-      // 다크 전용이다 — 라이트 모드를 만들지 않는다.
-      theme: AppTheme.dark(),
+      theme: AppTheme.light(),
       home: const HomeShell(),
     );
   }
@@ -77,7 +76,7 @@ class _HomeShellState extends State<HomeShell> {
       backgroundColor: SsuColors.canvas,
       appBar: AppBar(
         // 제목도 본문과 같은 축에 둔다. 본문만 가운데 정렬하면 축이 둘이 된다.
-        title: _Centered(child: Text(_titles[_index])),
+        title: _Centered.tight(child: Text(_titles[_index])),
         titleSpacing: 0,
       ),
       body: _Centered(
@@ -90,7 +89,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
         child: SafeArea(
           top: false,
-          child: _Centered(
+          child: _Centered.tight(
             child: NavigationBar(
               selectedIndex: _index,
               onDestinationSelected: (i) => setState(() => _index = i),
@@ -119,13 +118,24 @@ class _HomeShellState extends State<HomeShell> {
 /// 본문에만 폭 제약을 걸면 넓은 화면에서 축이 둘로 갈린다 —
 /// 제목은 왼쪽 끝, 목록은 가운데, 네비게이션은 전체 폭으로 퍼진다.
 class _Centered extends StatelessWidget {
-  const _Centered({required this.child});
+  /// 남는 세로 공간을 채운다. 본문처럼 높이가 필요한 곳에 쓴다.
+  const _Centered({required this.child}) : fillHeight = true;
+
+  /// 자식 높이에 맞춘다.
+  ///
+  /// 앱바 제목과 하단 네비게이션에는 반드시 이쪽을 쓴다. `Center` 는 부모가
+  /// 주는 세로 공간을 전부 차지하므로, bottomNavigationBar 슬롯에서 쓰면
+  /// 화면 높이를 통째로 먹고 본문에 0 을 남긴다 — 화면이 텅 비어 보인다.
+  const _Centered.tight({required this.child}) : fillHeight = false;
 
   final Widget child;
+  final bool fillHeight;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Align(
+      alignment: Alignment.center,
+      heightFactor: fillHeight ? null : 1.0,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: SsuLayout.contentWidth),
         child: child,
