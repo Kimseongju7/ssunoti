@@ -11,6 +11,8 @@ dependencies = [
     "lxml",
     "requests",
     "python-dotenv",
+    "firebase-admin",
+    "APScheduler>=3.6.0,<4.0.0",
 ]
 
 [project.optional-dependencies]
