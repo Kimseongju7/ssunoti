@@ -9,6 +9,7 @@ import 'providers/favorites_provider.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/notice_list_screen.dart';
 import 'services/fcm_service.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,10 +48,8 @@ class SsunotiApp extends StatelessWidget {
     return MaterialApp(
       title: 'SSUNoti',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1F4E9C)),
-        useMaterial3: true,
-      ),
+      // 테마 값의 근거는 저장소 루트 DESIGN.md 에 있다.
+      theme: AppTheme.light(),
       home: const HomeShell(),
     );
   }
