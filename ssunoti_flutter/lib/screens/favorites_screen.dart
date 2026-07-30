@@ -51,7 +51,8 @@ class FavoritesScreen extends ConsumerWidget {
 /// 마감 임박 판단을 서버가 못 하는 이유는 서버가 찜을 모르기 때문이다.
 /// 그래서 이 알림은 푸시가 아니라 앱 내 배너다.
 ///
-/// 경고를 색으로만 말하지 않는다 — 색 + 아이콘 + 건수 텍스트 세 겹.
+/// 표면을 한 단계 들어 올려 구획한다 — 색으로 면을 채우지 않는다.
+/// 경고는 색 점 + 아이콘 + 건수 텍스트 세 겹.
 class _ClosingSoonBanner extends StatelessWidget {
   const _ClosingSoonBanner({required this.count});
 
@@ -59,32 +60,39 @@ class _ClosingSoonBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: SsuColors.warning.withValues(alpha: 0.08),
-      padding: const EdgeInsets.symmetric(
-        horizontal: SsuSpace.lg,
-        vertical: SsuSpace.md,
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: SsuColors.surface1,
+        border: Border(bottom: BorderSide(color: SsuColors.hairline)),
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(maxWidth: SsuLayout.maxContentWidth),
-          child: Row(
-            children: [
-              const Icon(Icons.alarm, size: 18, color: SsuColors.warning),
-              const SizedBox(width: SsuSpace.sm),
-              Expanded(
-                child: Text(
-                  '찜한 공고 $count건이 곧 마감됩니다',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: SsuColors.warning,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: SsuSpace.md,
+          vertical: SsuSpace.sm,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: SsuLayout.statusDot,
+              height: SsuLayout.statusDot,
+              decoration: const BoxDecoration(
+                color: SsuColors.tagWarning,
+                shape: BoxShape.circle,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: SsuSpace.xs),
+            const Icon(Icons.alarm, size: 14, color: SsuColors.inkMuted),
+            const SizedBox(width: SsuSpace.xxs),
+            Expanded(
+              child: Text(
+                '찜한 공고 $count건이 곧 마감됩니다',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: SsuColors.inkMuted),
+              ),
+            ),
+          ],
         ),
       ),
     );

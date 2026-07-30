@@ -3,50 +3,61 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../theme/tokens.dart';
 
-/// SSUPath 의 상태 라벨.
+/// 상태 배지. Linear `status-badge` 를 확장했다.
 ///
-/// 원본 `.label_box > span` 을 그대로 옮겼다:
-/// `padding: 5px 15px; border-radius: 50px; font-size: 13px; line-height: 1`
-/// 글자는 항상 흰색이다 — 예외 없음.
-///
-/// 학생이 SSUPath 에서 이미 익힌 시각 규칙이라 형태를 바꾸지 않는다.
+/// **배경은 상태와 무관하게 항상 `surface2` 다.** 상태는 좌측 6px 점의
+/// 색으로만 말한다. 색을 면적으로 쓰면 어두운 캔버스 위에 색 덩어리가 생겨
+/// 제목이 묻힌다 — DESIGN.md 2·4절.
 class StatusPill extends StatelessWidget {
   const StatusPill({
     super.key,
     required this.label,
-    required this.background,
+    this.dotColor,
     this.icon,
     this.useNumericFont = false,
   });
 
   final String label;
-  final Color background;
+
+  /// 상태 점 색. null 이면 점을 그리지 않는다(분류 배지).
+  final Color? dotColor;
 
   /// 색에만 의존하지 않기 위한 아이콘. 경고 계열에는 반드시 넣는다.
   /// 근거: DESIGN.md 7절 — 색약 사용자와 흑백 화면에서도 읽혀야 한다.
   final IconData? icon;
 
-  /// 숫자가 주인 라벨(인원수, D-day)은 Poppins 600 을 쓴다.
+  /// 숫자가 주인 배지(인원수, D-day)는 JetBrains Mono 를 쓴다.
   final bool useNumericFont;
 
   @override
   Widget build(BuildContext context) {
     final textStyle = useNumericFont
-        ? AppTheme.numeric(size: 13)
-        : Theme.of(context).textTheme.labelMedium;
+        ? AppTheme.numeric()
+        : Theme.of(context).textTheme.labelSmall;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: SsuSpace.xs, vertical: 3),
       decoration: BoxDecoration(
-        color: background,
+        color: SsuColors.surface2,
         borderRadius: BorderRadius.circular(SsuRadius.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (dotColor != null) ...[
+            Container(
+              width: SsuLayout.statusDot,
+              height: SsuLayout.statusDot,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: SsuSpace.sm - 6),
+          ],
           if (icon != null) ...[
-            Icon(icon, size: 13, color: Colors.white),
-            const SizedBox(width: SsuSpace.xs),
+            Icon(icon, size: 12, color: SsuColors.inkMuted),
+            const SizedBox(width: SsuSpace.xxs),
           ],
           Text(label, style: textStyle),
         ],
@@ -55,10 +66,10 @@ class StatusPill extends StatelessWidget {
   }
 }
 
-/// 정보 박스. 원본 `.etc_cont` 를 그대로 옮겼다.
+/// 정보 카드. Linear `feature-card`.
 ///
-/// `padding: 12px 20px; border: 1px solid #E6E6E6; border-radius: 10px;
-/// background: #FDFDFD`
+/// `surface1` + `1px hairline` + `radius 12`. 그림자를 쓰지 않는다 —
+/// 깊이는 표면 사다리와 실선으로만 만든다.
 class InfoBox extends StatelessWidget {
   const InfoBox({super.key, required this.child});
 
@@ -67,79 +78,13 @@ class InfoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: SsuSpace.xl,
-        vertical: SsuSpace.md,
-      ),
+      padding: const EdgeInsets.all(SsuSpace.lg - 4),
       decoration: BoxDecoration(
-        color: SsuColors.surfaceSubtle,
-        border: Border.all(color: SsuColors.border),
+        color: SsuColors.surface1,
+        border: Border.all(color: SsuColors.hairline),
         borderRadius: BorderRadius.circular(SsuRadius.lg),
       ),
       child: child,
     );
   }
-}
-
-/// 파선 구분선. 원본 `border-top: 1px dashed #E8E8E8`.
-///
-/// Flutter 에 파선 Border 가 없어 직접 그린다. 실선으로 바꾸면 원본의
-/// 특징적인 질감이 사라진다.
-class DashedDivider extends StatelessWidget {
-  const DashedDivider({
-    super.key,
-    this.color = SsuColors.borderSoft,
-    this.dashWidth = 3,
-    this.dashGap = 3,
-  });
-
-  final Color color;
-  final double dashWidth;
-  final double dashGap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 1,
-      width: double.infinity,
-      child: CustomPaint(
-        painter: _DashedLinePainter(
-          color: color,
-          dashWidth: dashWidth,
-          dashGap: dashGap,
-        ),
-      ),
-    );
-  }
-}
-
-class _DashedLinePainter extends CustomPainter {
-  const _DashedLinePainter({
-    required this.color,
-    required this.dashWidth,
-    required this.dashGap,
-  });
-
-  final Color color;
-  final double dashWidth;
-  final double dashGap;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1;
-
-    var x = 0.0;
-    while (x < size.width) {
-      canvas.drawLine(Offset(x, 0), Offset(x + dashWidth, 0), paint);
-      x += dashWidth + dashGap;
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedLinePainter oldDelegate) =>
-      oldDelegate.color != color ||
-      oldDelegate.dashWidth != dashWidth ||
-      oldDelegate.dashGap != dashGap;
 }

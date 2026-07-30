@@ -38,41 +38,42 @@ class NoticeDetailScreen extends ConsumerWidget {
         title: const Text('공고 상세'),
         actions: [
           IconButton(
+            iconSize: 20,
             icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-            color: isFavorite ? SsuColors.favorite : SsuColors.textFaint,
+            // 찜은 주요 상호작용이라 라벤더를 쓴다.
+            color: isFavorite ? SsuColors.accent : SsuColors.inkSubtle,
             tooltip: isFavorite ? '찜 해제' : '찜하기',
             onPressed: () =>
                 ref.read(favoriteIdsProvider.notifier).toggle(noticeId),
           ),
+          const SizedBox(width: SsuSpace.xs),
         ],
       ),
       body: Center(
         child: ConstrainedBox(
           constraints:
-              const BoxConstraints(maxWidth: SsuLayout.maxContentWidth),
+              const BoxConstraints(maxWidth: SsuLayout.contentWidth),
           child: ListView(
-            padding: const EdgeInsets.all(SsuSpace.lg),
+            padding: const EdgeInsets.all(SsuSpace.md),
             children: [
               Text(
                 notice.title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: notice.isClosed()
-                          ? SsuColors.textDisabled
-                          : SsuColors.textStrong,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: notice.isClosed() ? SsuColors.inkTertiary : null,
                     ),
               ),
-              const SizedBox(height: SsuSpace.md),
+              const SizedBox(height: SsuSpace.sm),
               _StatusRow(notice: notice),
-              const SizedBox(height: SsuSpace.xxl),
+              const SizedBox(height: SsuSpace.lg),
               InfoBox(child: _InfoTable(notice: notice)),
               if (notice.content.isNotEmpty) ...[
-                const SizedBox(height: SsuSpace.xxl),
+                const SizedBox(height: SsuSpace.lg),
                 Text(
                   notice.content,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
-              const SizedBox(height: SsuSpace.xxl),
+              const SizedBox(height: SsuSpace.xl),
             ],
           ),
         ),
@@ -89,19 +90,15 @@ class _StatusRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final closed = notice.isClosed();
     return Wrap(
-      spacing: SsuSpace.xs,
-      runSpacing: SsuSpace.xs,
+      spacing: SsuSpace.xxs,
+      runSpacing: SsuSpace.xxs,
       children: [
-        closed
-            ? const StatusPill(label: '종료', background: SsuColors.statusClosed)
-            : const StatusPill(label: '모집중', background: SsuColors.statusOpen),
+        notice.isClosed()
+            ? const StatusPill(label: '종료', dotColor: SsuColors.tagClosed)
+            : const StatusPill(label: '모집중', dotColor: SsuColors.tagOpen),
         if (notice.deadline == null)
-          const StatusPill(
-            label: '상시모집',
-            background: SsuColors.statusWaiting,
-          ),
+          const StatusPill(label: '상시모집', dotColor: SsuColors.tagAlways),
       ],
     );
   }
@@ -174,30 +171,26 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = highlight ? SsuColors.tagWarning : SsuColors.ink;
     final valueStyle = numeric
-        ? AppTheme.numeric(
-            size: 15,
-            color: highlight ? SsuColors.warning : SsuColors.textStrong,
-          )
-        : Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: highlight ? SsuColors.warning : SsuColors.textStrong,
-            );
+        ? AppTheme.numeric(size: 13, color: color)
+        : Theme.of(context).textTheme.bodyLarge?.copyWith(color: color);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: SsuSpace.sm),
+      padding: const EdgeInsets.symmetric(vertical: SsuSpace.xs),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 88,
+            width: 80,
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           if (highlight) ...[
-            const Icon(Icons.alarm, size: 15, color: SsuColors.warning),
-            const SizedBox(width: SsuSpace.xs),
+            const Icon(Icons.alarm, size: 13, color: SsuColors.tagWarning),
+            const SizedBox(width: SsuSpace.xxs),
           ],
           Expanded(child: Text(value, style: valueStyle)),
         ],
@@ -220,25 +213,21 @@ class _ApplyBar extends StatelessWidget {
     final closed = notice.isClosed();
     final url = notice.url;
 
-    return SafeArea(
-      child: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: SsuColors.borderSoft)),
-        ),
-        padding: const EdgeInsets.all(SsuSpace.md),
-        child: Center(
-          child: ConstrainedBox(
-            constraints:
-                const BoxConstraints(maxWidth: SsuLayout.maxContentWidth),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(SsuRadius.md),
-                // 회색이 아니라 브랜드 청록이 섞인 그림자. 원본 값 그대로.
-                boxShadow:
-                    closed || url.isEmpty ? SsuShadow.none : SsuShadow.brand,
-              ),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: SsuColors.canvas,
+        border: Border(top: BorderSide(color: SsuColors.hairline)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(SsuSpace.sm),
+          child: Center(
+            child: ConstrainedBox(
+              constraints:
+                  const BoxConstraints(maxWidth: SsuLayout.contentWidth),
               child: FilledButton.icon(
-                icon: const Icon(Icons.open_in_new, size: 18),
+                icon: const Icon(Icons.open_in_new, size: 16),
                 label: Text(closed ? '모집이 종료되었습니다' : 'SSUPath 에서 신청하기'),
                 onPressed:
                     closed || url.isEmpty ? null : () => _open(context, url),

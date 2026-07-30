@@ -35,7 +35,7 @@ class NoticeListScreen extends ConsumerWidget {
 
 /// 공고 목록 뷰. 목록 화면과 찜 화면이 함께 쓴다.
 ///
-/// 카드를 띄우지 않는다. 각 항목이 아래쪽에 파선 구분선을 그린다.
+/// 각 행이 하단에 1px hairline 을 그린다. 카드로 띄우지 않는다.
 class NoticeListView extends StatelessWidget {
   const NoticeListView({super.key, required this.notices});
 
@@ -43,25 +43,20 @@ class NoticeListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: SsuLayout.maxContentWidth),
-        child: ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: notices.length,
-          itemBuilder: (context, index) {
-            final notice = notices[index];
-            return NoticeCard(
-              notice: notice,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => NoticeDetailScreen(noticeId: notice.noticeId),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: notices.length,
+      itemBuilder: (context, index) {
+        final notice = notices[index];
+        return NoticeCard(
+          notice: notice,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => NoticeDetailScreen(noticeId: notice.noticeId),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -83,21 +78,21 @@ class EmptyStateView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(SsuSpace.xxl),
+        padding: const EdgeInsets.all(SsuSpace.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: SsuColors.borderStrong),
-            const SizedBox(height: SsuSpace.lg),
+            Icon(icon, size: 40, color: SsuColors.inkTertiary),
+            const SizedBox(height: SsuSpace.md),
             Text(
               message,
               style: Theme.of(context)
                   .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: SsuColors.textMuted),
+                  .titleSmall
+                  ?.copyWith(color: SsuColors.inkMuted),
             ),
             if (hint != null) ...[
-              const SizedBox(height: SsuSpace.sm),
+              const SizedBox(height: SsuSpace.xs),
               Text(
                 hint!,
                 textAlign: TextAlign.center,
@@ -124,21 +119,21 @@ class ErrorStateView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(SsuSpace.xxl),
+        padding: const EdgeInsets.all(SsuSpace.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off, size: 48, color: SsuColors.danger),
-            const SizedBox(height: SsuSpace.lg),
+            const Icon(Icons.cloud_off, size: 40, color: SsuColors.tagWarning),
+            const SizedBox(height: SsuSpace.md),
             Text(
               '공고를 불러오지 못했습니다',
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
-            const SizedBox(height: SsuSpace.sm),
+            const SizedBox(height: SsuSpace.xs),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelSmall,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),

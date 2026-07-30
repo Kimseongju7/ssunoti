@@ -1,138 +1,98 @@
 import 'package:flutter/material.dart';
 
-/// SSUPath 실제 CSS 에서 추출한 디자인 토큰.
+/// Linear.app 디자인 시스템 토큰.
 ///
-/// 값의 근거는 저장소 루트 DESIGN.md 에 있다. 이 파일의 값을 바꾸려면
-/// 먼저 DESIGN.md 를 고친다 — 문서가 정본이고 코드가 사본이다.
+/// 값의 근거는 저장소 루트 DESIGN.md 에 있다. 바꾸려면 문서를 먼저 고친다 —
+/// 문서가 정본이고 코드가 사본이다.
 abstract final class SsuColors {
-  // ── Brand ────────────────────────────────────────────────────────────────
-  /// 최상위 강조. 원본 `.label_box .col08`
-  static const navy = Color(0xFF0E2767);
+  // ── Brand & Accent ───────────────────────────────────────────────────────
+  /// 희소 자원이다. 브랜드·주요 CTA·포커스 링·찜 활성에만 쓴다.
+  static const accent = Color(0xFF5E6AD2);
+  static const accentHover = Color(0xFF828FFF);
+  static const accentFocus = Color(0xFF5E69D1);
 
-  /// 보조 강조. 원본 그림자 색의 원본값
-  static const teal = Color(0xFF00688F);
+  // ── Surface Ladder (4단계. 건너뛰지 않는다) ─────────────────────────────
+  /// 순수 검정이 아니다. 옅은 청색 기운이 의도된 것.
+  static const canvas = Color(0xFF010102);
+  static const surface1 = Color(0xFF0F1011);
+  static const surface2 = Color(0xFF141516);
+  static const surface3 = Color(0xFF18191A);
+  static const surface4 = Color(0xFF191A1B);
 
-  /// 포인트
-  static const cyan = Color(0xFF00A4CA);
+  // ── Hairlines ────────────────────────────────────────────────────────────
+  static const hairline = Color(0xFF23252A);
+  static const hairlineStrong = Color(0xFF34343A);
+  static const hairlineTertiary = Color(0xFF3E3E44);
 
-  // ── Status (pill 라벨 배경. 원본 클래스와 1:1) ──────────────────────────
-  /// 모집중. 원본 `.col01`
-  static const statusOpen = Color(0xFF0D97FF);
+  // ── Ink ──────────────────────────────────────────────────────────────────
+  static const ink = Color(0xFFF7F8F8);
+  static const inkMuted = Color(0xFFD0D6E0);
+  static const inkSubtle = Color(0xFF8A8F98);
 
-  /// 모집대기. 원본 `.col02`
-  static const statusWaiting = Color(0xFF43B5A4);
+  /// 비활성, 각주, 종료 공고
+  static const inkTertiary = Color(0xFF62666D);
 
-  /// 일반 분류. 원본 `.col05`
-  static const statusNeutral = Color(0xFF747474);
-
-  /// 강조 분류. 원본 `.col08`
-  static const statusEmphasis = Color(0xFF0E2767);
-
-  /// 종료. 원본 `.end .label`
-  static const statusClosed = Color(0xFFBCBCBC);
-
-  // ── Text ─────────────────────────────────────────────────────────────────
-  static const textStrong = Color(0xFF222222);
-  static const textBody = Color(0xFF333333);
-  static const textMuted = Color(0xFF666666);
-  static const textFaint = Color(0xFF999999);
-
-  /// 종료 공고 제목. 원본 `.end .tit`
-  static const textDisabled = Color(0xFF949494);
-
-  // ── Surface & Line ───────────────────────────────────────────────────────
-  static const surface = Color(0xFFFFFFFF);
-
-  /// 정보 박스. 원본 `.etc_cont`
-  static const surfaceSubtle = Color(0xFFFDFDFD);
-  static const surfaceAlt = Color(0xFFFAFAFA);
-
-  static const border = Color(0xFFE6E6E6);
-
-  /// 목록 구분선 (dashed)
-  static const borderSoft = Color(0xFFE8E8E8);
-  static const borderStrong = Color(0xFFE1E5E6);
-
-  // ── Semantic (원본에 없어 신규 정의) ────────────────────────────────────
-  /// 마감 임박 · 정원 임박
-  static const warning = Color(0xFFE8590C);
-
-  /// 마감됨 · 오류
-  static const danger = Color(0xFFC92A2A);
-
-  /// 찜 하트
-  static const favorite = Color(0xFFE64980);
+  // ── Status Tags ──────────────────────────────────────────────────────────
+  // Linear 마케팅 규칙은 2차 색상을 금지하지만, 원본이 명시하듯 제품 UI 의
+  // 상태 태그는 예외다. 대신 색을 면적으로 쓰지 않고 6px 점으로만 쓴다.
+  // 배지 배경은 상태와 무관하게 항상 surface2 다.
+  static const tagOpen = Color(0xFF4EA7FC);
+  static const tagAlways = Color(0xFF27A644);
+  static const tagWarning = Color(0xFFF2994A);
+  static const tagClosed = Color(0xFF62666D);
 }
 
-/// 간격 스케일. 원본 padding/margin 실측값에서 4의 배수만 추림.
+/// 간격 스케일. Linear 원본 그대로.
 abstract final class SsuSpace {
-  static const xs = 4.0;
-  static const sm = 8.0;
-  static const md = 12.0;
-  static const lg = 16.0;
-  static const xl = 20.0;
-  static const xxl = 24.0;
+  static const xxs = 4.0;
+  static const xs = 8.0;
+  static const sm = 12.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
+  static const xxl = 48.0;
 }
 
-/// 반경 스케일. 원본 최다값이 3px 이라 거의 각진 인터페이스다.
+/// 반경 스케일. Linear 원본 그대로.
 abstract final class SsuRadius {
-  static const sm = 3.0;
-  static const md = 5.0;
-  static const lg = 10.0;
+  static const xs = 4.0;
+  static const sm = 6.0;
 
-  /// 상태 라벨 전용
-  static const pill = 50.0;
-}
+  /// 버튼·입력. 주요 버튼을 pill 로 만들지 않는다.
+  static const md = 8.0;
+  static const lg = 12.0;
+  static const xl = 16.0;
 
-/// 그림자. 원본은 거의 쓰지 않고, 쓰는 곳도 극히 얕다.
-abstract final class SsuShadow {
-  static const none = <BoxShadow>[];
-
-  static const level1 = <BoxShadow>[
-    BoxShadow(
-      color: Color(0x0D000000), // rgba(0,0,0,0.05)
-      blurRadius: 8,
-      offset: Offset(0, 3),
-    ),
-  ];
-
-  static const level2 = <BoxShadow>[
-    BoxShadow(
-      color: Color(0x0D000000),
-      blurRadius: 15,
-      spreadRadius: 2,
-      offset: Offset(0, 5),
-    ),
-  ];
-
-  /// Primary 버튼. 회색이 아니라 브랜드 청록이 섞인 그림자다.
-  /// 원본 `0 4px 8px rgba(0,104,143,0.24)`
-  static const brand = <BoxShadow>[
-    BoxShadow(
-      color: Color(0x3D00688F),
-      blurRadius: 8,
-      offset: Offset(0, 4),
-    ),
-  ];
+  /// 상태 배지, 탭 전용
+  static const pill = 9999.0;
 }
 
 /// 폰트 패밀리.
+///
+/// Linear 서체는 독점이라 원본이 허용한 오픈소스 대체를 쓴다.
+/// Inter 에는 한글이 없어 Noto Sans KR 을 폴백으로 둔다.
 abstract final class SsuFont {
-  /// 본문. 원본이 100/300/400/500/600 을 로드한다.
-  static const body = 'NotoSansKR';
+  static const latin = 'Inter';
+  static const korean = 'NotoSansKR';
 
-  /// 숫자·영문 강조. 원본이 이 용도로만 쓴다.
-  static const numeric = 'Poppins';
+  /// 정원·D-day 등 숫자 강조
+  static const mono = 'JetBrainsMono';
 }
 
-/// 레이아웃 상수.
+/// 레이아웃 상수. DESIGN.md 5·8절.
 abstract final class SsuLayout {
-  /// 본문 최대폭. 한글 한 줄이 길면 읽기 나쁘다.
-  static const maxContentWidth = 600.0;
+  /// 태블릿 이하 본문 최대폭
+  static const contentWidth = 720.0;
 
-  /// 터치 타깃 최소 크기.
-  static const minTouchTarget = 48.0;
+  /// 데스크톱 최대폭
+  static const maxWidth = 1280.0;
 
-  /// 2분할 레이아웃 진입 폭.
+  /// 2분할 진입 폭
   static const splitBreakpoint = 1024.0;
+
+  /// 터치 타깃 최소 크기
+  static const minTouchTarget = 44.0;
+
+  /// 상태 점 지름
+  static const statusDot = 6.0;
 }

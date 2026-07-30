@@ -10,6 +10,7 @@ import 'screens/favorites_screen.dart';
 import 'screens/notice_list_screen.dart';
 import 'services/fcm_service.dart';
 import 'theme/app_theme.dart';
+import 'theme/tokens.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +50,8 @@ class SsunotiApp extends StatelessWidget {
       title: 'SSUNoti',
       debugShowCheckedModeBanner: false,
       // 테마 값의 근거는 저장소 루트 DESIGN.md 에 있다.
-      theme: AppTheme.light(),
+      // 다크 전용이다 — 라이트 모드를 만들지 않는다.
+      theme: AppTheme.dark(),
       home: const HomeShell(),
     );
   }
@@ -72,23 +74,61 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_index])),
-      body: IndexedStack(index: _index, children: _screens),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.list_alt_outlined),
-            selectedIcon: Icon(Icons.list_alt),
-            label: '공고',
+      backgroundColor: SsuColors.canvas,
+      appBar: AppBar(
+        // 제목도 본문과 같은 축에 둔다. 본문만 가운데 정렬하면 축이 둘이 된다.
+        title: _Centered(child: Text(_titles[_index])),
+        titleSpacing: 0,
+      ),
+      body: _Centered(
+        child: IndexedStack(index: _index, children: _screens),
+      ),
+      bottomNavigationBar: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: SsuColors.surface3,
+          border: Border(top: BorderSide(color: SsuColors.hairline)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: _Centered(
+            child: NavigationBar(
+              selectedIndex: _index,
+              onDestinationSelected: (i) => setState(() => _index = i),
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.list_alt_outlined),
+                  selectedIcon: Icon(Icons.list_alt),
+                  label: '공고',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.favorite_border),
+                  selectedIcon: Icon(Icons.favorite),
+                  label: '찜',
+                ),
+              ],
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border),
-            selectedIcon: Icon(Icons.favorite),
-            label: '찜',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 앱바·본문·하단 네비게이션을 같은 폭 축에 묶는다.
+///
+/// 본문에만 폭 제약을 걸면 넓은 화면에서 축이 둘로 갈린다 —
+/// 제목은 왼쪽 끝, 목록은 가운데, 네비게이션은 전체 폭으로 퍼진다.
+class _Centered extends StatelessWidget {
+  const _Centered({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: SsuLayout.contentWidth),
+        child: child,
       ),
     );
   }
